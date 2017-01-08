@@ -16,7 +16,7 @@ var scrape = require('scrape');
 var http = require('http');
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi();
-
+var _ = require('lodash');
 
 // set this by running this in command prompt:
 // set CLIENT_ID=abc123abc123abc123
@@ -214,7 +214,6 @@ app.get('/related_artists', function(req,res){
         }));
       }).then(function() {
           console.log(related_uris);
-          res.json(related_uris);
           // Get the authenticated user
           spotifyApi.getMe()
             .then(function(data) {
@@ -224,13 +223,20 @@ app.get('/related_artists', function(req,res){
                   // Create a private playlist
                   spotifyApi.createPlaylist(data.body.id, artist + 's Recommended Artists', { 'public' : true })
                     .then(function(data) {
-                      console.log('playlist id:' + data.body.id);
+                      var playlistId = data.body.id;
+                      console.log('playlist id:' + playlistId);
+                      res.json(playlistId);
                       console.log('Created playlist!');
-                      spotifyApi.addTracksToPlaylist(userid, data.body.id , related_uris)
-                      .then(function(data) {
-                        console.log('Added tracks to playlist!');
-                      }, function(err) {
-                        console.log('Something went wrong!', err);
+
+                      var chunks = _.chunk(related_uris, 5);
+
+                      seq(chunks, function(chunk){
+                        return spotifyApi.addTracksToPlaylist(userid, playlistId, chunk)
+                          .then(function(data) {
+                            console.log('Added tracks to playlist!');
+                          }, function(err) {
+                            console.log('Something went wrong!', err);
+                          });
                       });
 
                     }, function(err) {
@@ -245,6 +251,15 @@ app.get('/related_artists', function(req,res){
       });
   });
 });
+
+function seq(input, callback) {
+  if (input.length === 0) {
+    return Promise.resolve(true);
+  }
+  return callback(input[0]).then(function(){
+    return seq(input.slice(1), callback);
+  });
+}
 
 
 console.log('Listening on 8888');
