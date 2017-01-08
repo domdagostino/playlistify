@@ -6,7 +6,7 @@
  * For more information, read
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
-
+require('dotenv').config()
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
 var querystring = require('querystring');
@@ -215,6 +215,30 @@ app.get('/related_artists', function(req,res){
       }).then(function() {
           console.log(related_uris);
           res.json(related_uris);
+          // Get the authenticated user
+          spotifyApi.getMe()
+            .then(function(data) {
+              console.log('Some information about the authenticated user', data.body);
+                  console.log('user id:' + data.body.id);
+                  var userid = data.body.id;
+                  // Create a private playlist
+                  spotifyApi.createPlaylist(data.body.id, artist + 's Recommended Artists', { 'public' : true })
+                    .then(function(data) {
+                      console.log('playlist id:' + data.body.id);
+                      console.log('Created playlist!');
+                      spotifyApi.addTracksToPlaylist(userid, data.body.id , related_uris)
+                      .then(function(data) {
+                        console.log('Added tracks to playlist!');
+                      }, function(err) {
+                        console.log('Something went wrong!', err);
+                      });
+
+                    }, function(err) {
+                      console.log('Something went wrong making a playlist!', err);
+                    });
+            }, function(err) {
+              console.log('Something went wrong!', err);
+            });
       }).catch(function(err) {
         // Will catch failure of first failed promise
         console.log("Failed:", err);
