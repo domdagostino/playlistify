@@ -158,6 +158,9 @@ app.get('/refresh_token', function(req, res) {
 
 app.get('/related_artists', function(req,res){
   var artist = req.query.artist; 
+  artist = artist.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+      return letter.toUpperCase();
+  });
   var access_token = req.query.access_token;
   var url = 'https://www.music-map.com/' + artist + '.html';
   var related = [];
@@ -213,22 +216,18 @@ app.get('/related_artists', function(req,res){
           }
         }));
       }).then(function() {
-          console.log(related_uris);
           // Get the authenticated user
           spotifyApi.getMe()
             .then(function(data) {
-              console.log('Some information about the authenticated user', data.body);
-                  console.log('user id:' + data.body.id);
                   var userid = data.body.id;
                   // Create a private playlist
-                  spotifyApi.createPlaylist(data.body.id, artist + 's Recommended Artists', { 'public' : true })
+                  spotifyApi.createPlaylist(data.body.id, artist + "'s Recommended Tracks", { 'public' : true })
                     .then(function(data) {
                       var playlistId = data.body.id;
-                      console.log('playlist id:' + playlistId);
                       res.json(playlistId);
                       console.log('Created playlist!');
 
-                      var chunks = _.chunk(related_uris, 5);
+                      var chunks = _.chunk(related_uris, 10);
 
                       seq(chunks, function(chunk){
                         return spotifyApi.addTracksToPlaylist(userid, playlistId, chunk)
