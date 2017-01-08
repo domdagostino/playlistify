@@ -158,8 +158,17 @@ app.get('/refresh_token', function(req, res) {
 
 app.get('/related_artists', function(req,res){
   var artist = req.query.artist; 
+  var access_token = req.query.access_token;
   var url = 'https://www.music-map.com/' + artist + '.html';
   var related = [];
+
+  var spotifyApi = new SpotifyWebApi({
+    clientId: client_id,
+    clientSecret: client_secret,
+    redirectUri: redirect_uri
+  });
+
+  spotifyApi.setAccessToken(access_token);
 
   request(url, function (err, resp, body) {
       if (err) return console.error(err);
