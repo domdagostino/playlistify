@@ -86,7 +86,7 @@
             });
              $('.submit').on( 'click', function () {
                var artist = ($('.artist_input').val());
-                $.get("/related_artists", {artist:artist})
+                $.get("/related_artists", {artist:artist, access_token: access_token})
                 .success(
                     function(success){
                         console.log(success)
