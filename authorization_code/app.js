@@ -18,9 +18,14 @@ var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi();
 
 
-// This is client #2
-var client_id = process.env.CLIENT_ID; // Your client id
+// set this by running this in command prompt:
+// set CLIENT_ID=abc123abc123abc123
+var client_id = process.env.CLIENT_ID;
+
+// set this by running this in command prompt:
+// set CLIENT_SECRET=abc123abc123abc123
 var client_secret = process.env.CLIENT_SECRET; // Your secret
+
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 
