@@ -23,22 +23,17 @@
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
-        <div id="user-profile">
-        </div>
-        <div id="oauth">
-        </div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+      <br />
+      <br />
+      <br />
+        <form>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Which Artist would you like recommendations for?</label>
+              <input type="text" class="artist_input form-control" id="exampleInputEmail1" placeholder="Type Artist Here">
+            </div>
+            <div type="submit" class="submit btn btn-default">Submit</div>
+        </form>
       </div>
-      <br />
-      <br />
-      <br />
-      <form>
-          <div class="form-group">
-            <label for="exampleInputEmail1">Which Artist would you like recommendations for?</label>
-            <input type="text" class="artist_input form-control" id="exampleInputEmail1" placeholder="Type Artist Here">
-          </div>
-          <div type="submit" class="submit btn btn-default">Submit</div>
-      </form>
     </div>
 
 
@@ -113,13 +108,7 @@
           return hashParams;
         }
 
-        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-            userProfileTemplate = Handlebars.compile(userProfileSource),
-            userProfilePlaceholder = document.getElementById('user-profile');
 
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth');
 
         var params = getHashParams();
 
@@ -131,11 +120,6 @@
           alert('There was an error during the authentication');
         } else {
           if (access_token) {
-            // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
 
             $.ajax({
                 url: 'https://api.spotify.com/v1/me',
@@ -143,8 +127,6 @@
                   'Authorization': 'Bearer ' + access_token
                 },
                 success: function(response) {
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-
                   $('#login').hide();
                   $('#loggedin').show();
                 }

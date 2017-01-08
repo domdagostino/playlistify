@@ -25,8 +25,7 @@ var client_id = process.env.CLIENT_ID;
 // set this by running this in command prompt:
 // set CLIENT_SECRET=abc123abc123abc123
 var client_secret = process.env.CLIENT_SECRET; // Your secret
-
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var redirect_uri = process.env.REDIRECT_URI; // Your redirect uri
 
 
 /**
