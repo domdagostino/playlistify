@@ -1,6 +1,9 @@
 {
   "author": "Dom DAgostino",
   "name": "playlistify",
+  "scripts": {
+    "start": "node authorization_code/app.js"
+  }
   "description": "",
   "version": "0.0.1",
   "dependencies": {
