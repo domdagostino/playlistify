@@ -19,8 +19,8 @@ var spotifyApi = new SpotifyWebApi();
 
 
 // This is client #2
-var client_id = 'CLIENT_ID_HERE'; // Your client id
-var client_secret = 'CLIENT_SECRET_HERE'; // Your secret
+var client_id = process.env.CLIENT_ID; // Your client id
+var client_secret = process.env.CLIENT_SECRET; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 
@@ -164,7 +164,8 @@ app.get('/related_artists', function(req,res){
         var name = $(this).text();
         related.push(name);
       });
-      res.json(related);
+      
+
       var related_ids = related.map(function (entry) {
         return spotifyApi.searchArtists(entry)
           .then(function(data) {
@@ -184,18 +185,22 @@ app.get('/related_artists', function(req,res){
       .then(function(arrayOfIds){
         return Promise.all(arrayOfIds.map(function(item) {
           if (item) {
-             spotifyApi.getArtistTopTracks(item, 'US')
+             return spotifyApi.getArtistTopTracks(item, 'US')
               .then(function(data) {
-                  for (i = 0; i <= 2; i++) { 
-                    return related_uris.push(data.body.tracks[i].uri);
+                  for (i = 0; i <= 2; i++) {
+                    var track = data.body.tracks[i];
+                    if (track) { 
+                      related_uris.push(track.uri);
+                    }
                   }
                 });
           } else {
-            return Promise.resolve(null);
+            return Promise.resolve();
           }
         }));
-      }).then(function(related_uris) {
+      }).then(function() {
           console.log(related_uris);
+          res.json(related_uris);
       }).catch(function(err) {
         // Will catch failure of first failed promise
         console.log("Failed:", err);
